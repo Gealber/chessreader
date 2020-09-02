@@ -157,7 +157,7 @@ class MainWindow(QWidget):
             game = self.game_state.game_loaded
             move = game.get_move('f', self.game_state.board)
             print(move, game.current_pos)
-            if move is not None:
+            if move is not None and self.game_state.isValidMove(move):
                 self.game_state.makeMove(move)
 
 

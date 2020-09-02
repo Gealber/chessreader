@@ -19,14 +19,19 @@ class Square(QLabel):
         self.color = color
         self.pos = pos
         self.piece = piece
-        if self.piece:
-            pixmap = QPixmap(self.piece)
-            self.setPixmap(pixmap)
+        self.refresh_pixmap()
+       # if self.piece:
+       #     pixmap = QPixmap(self.piece)
+       #     self.setPixmap(pixmap)
 
     def setSqColor(self, color):
         palette = self.palette()
         palette.setColor(QPalette.Window, QColor(color))
         self.setPalette(palette)
+
+    def refresh_pixmap(self):
+        p = QPixmap() if self.piece is None else QPixmap(self.piece)
+        self.setPixmap(p)
 
 
 

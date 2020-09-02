@@ -1,4 +1,5 @@
 import chess
+import os
 from PyQt5.QtWidgets import *
 from PyQt5.QtCore import *
 from PyQt5.QtGui import *
@@ -45,12 +46,31 @@ class GameState:
         self.whiteToMove = not self.whiteToMove
 
     def undoMove(self):
+        print(self.moveLog)
         if self.moveLog:
             lastMove = self.moveLog.pop()
-            print(lastMove, self.moveLog)
+            print(lastMove.pieceCapture)
+            sq1 = self.squares[lastMove.endRow][lastMove.endCol]
+            sq2 = self.squares[lastMove.startRow][lastMove.startCol]
             self.board[lastMove.endRow][lastMove.endCol] = lastMove.pieceCapture
+            sq1.piece = os.path.join("images","pieces",f"{lastMove.pieceCapture}.svg")
             self.board[lastMove.startRow][lastMove.startCol] = lastMove.pieceMoved
+            sq2.piece = os.path.join("images","pieces",f"{lastMove.pieceMoved}.svg")
+            sq1.refresh_pixmap()
+            sq2.refresh_pixmap()
+            if lastMove.special == 'pb':
+                self.board[lastMove.endRow-1][lastMove.endCol] = 'wP'
+            elif lastMove.special == 'pw':
+                self.board[lastMove.endRow+1][lastMove.endCol] = 'bP'
+            elif lastMove.special == 'cr':
+                self.board[lastMove.endRow][7] = f'{lastMove.pieceMoved[0]}R'
+                self.board[lastMove.endRow][5] = "--"
+            elif lastMove.special == 'cl':
+                self.board[lastMove.endRow][0] = f'{lastMove.pieceMoved[0]}R'
+                self.board[lastMove.endRow][3] = "--"
+            self._board.pop()
             self.whiteToMove = not self.whiteToMove
+
 
     def isValidMove(self, move):
         uci_move = chess.Move.from_uci(move.getChessNotation())
@@ -116,7 +136,8 @@ class Move:
     filesToCols = {v:k for k, v in enumerate(letters)}
     colsToFiles = {v: k for k, v in filesToCols.items()}
 
-    def __init__(self, startSq, endSq, board):
+    def __init__(self, startSq, endSq, board, special=None):
+        self.special = special
         self.startRow = startSq[0]
         self.startCol = startSq[1]
         self.endRow = endSq[0]
