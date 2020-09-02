@@ -11,6 +11,7 @@ class GameState:
         self.whiteToMove = True
         self.moveLog = []
         self.playerClicks = []
+        self.game_loaded = None
 
     def board_repre(self):
         board = [row.split() for row in self._board.__str__().split("\n")]
@@ -99,23 +100,12 @@ class GameState:
     def replacePieces(self, startRow, startCol, endRow, endCol):
         sq2 = self.squares[endRow][endCol]
         sq1 = self.squares[startRow][startCol]
-        print(sq1)
-        print(sq2)
         sq2.setPixmap(sq1.pixmap())
         sq1.setPixmap(QPixmap())
 
     def updateState(self, FEN):
         self._board = chess.Board(FEN)
-        print(self._board)
         self.board = self.board_repre()
-
-    def getValidMove(self):
-        """All moves considering checks"""
-        pass
-
-    def getAllPosibleMoves(self):
-        """All moves without consifering checks"""
-        pass
 
 
 class Move:
