@@ -152,23 +152,13 @@ class MainWindow(QWidget):
                 print("Not a valid pgn")
 
     def onForwardPressed(self, button):
-        print("Forward pressed")
         if self.game_state.game_loaded:
             game = self.game_state.game_loaded
             move = game.get_move('f', self.game_state.board)
-            print(move, game.current_pos)
             if move is not None and self.game_state.isValidMove(move):
                 self.game_state.makeMove(move)
 
 
     def onBackwardPressed(self, button):
-        print("Backward pressed")
-        if self.game_state.game_loaded:
-            self.game_state.undoMove()
-#            game = self.game_state.game_loaded
-#            move = game.get_move('b', self.game_state.board)
-#            if move is not None:
-#                self.game_state.makeMove(move)
-#            print(move, game.current_pos)
-
+        self.game_state.undoMove()
 

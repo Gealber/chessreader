@@ -46,10 +46,8 @@ class GameState:
         self.whiteToMove = not self.whiteToMove
 
     def undoMove(self):
-        print(self.moveLog)
         if self.moveLog:
             lastMove = self.moveLog.pop()
-            print(lastMove.pieceCapture)
             sq1 = self.squares[lastMove.endRow][lastMove.endCol]
             sq2 = self.squares[lastMove.startRow][lastMove.startCol]
             self.board[lastMove.endRow][lastMove.endCol] = lastMove.pieceCapture
@@ -58,19 +56,43 @@ class GameState:
             sq2.piece = os.path.join("images","pieces",f"{lastMove.pieceMoved}.svg")
             sq1.refresh_pixmap()
             sq2.refresh_pixmap()
-            if lastMove.special == 'pb':
-                self.board[lastMove.endRow-1][lastMove.endCol] = 'wP'
-            elif lastMove.special == 'pw':
-                self.board[lastMove.endRow+1][lastMove.endCol] = 'bP'
-            elif lastMove.special == 'cr':
-                self.board[lastMove.endRow][7] = f'{lastMove.pieceMoved[0]}R'
-                self.board[lastMove.endRow][5] = "--"
-            elif lastMove.special == 'cl':
-                self.board[lastMove.endRow][0] = f'{lastMove.pieceMoved[0]}R'
-                self.board[lastMove.endRow][3] = "--"
+            self.passant_update(lastMove)
+            self.castling_update(lastMove)
+
             self._board.pop()
             self.whiteToMove = not self.whiteToMove
 
+    def passant_update(self, lastMove):
+            if lastMove.special == 'pb':
+                sq3 = self.squares[lastMove.endRow-1][lastMove.endCol]
+                sq3.piece = os.path.join("images","pieces","wP.svg")
+                self.board[lastMove.endRow-1][lastMove.endCol] = 'wP'
+                sq3.refresh_pixmap()
+            elif lastMove.special == 'pw':
+                sq3 = self.squares[lastMove.endRow+1][lastMove.endCol]
+                sq3.piece = os.path.join("images", "pieces", "bP.svg")
+                self.board[lastMove.endRow+1][lastMove.endCol] = 'bP'
+                sq3.refresh_pixmap()
+
+    def castling_update(self,lastMove):
+        if lastMove.special == 'cr':
+            sq3 = self.squares[lastMove.endRow][7]
+            sq3.piece = os.path.join("images","pieces",f"{lastMove.pieceMoved[0]}R.svg")
+            sq3.refresh_pixmap()
+            self.board[lastMove.endRow][7] = f'{lastMove.pieceMoved[0]}R'
+            sq3 = self.squares[lastMove.endRow][5]
+            sq3.piece = None
+            sq3.refresh_pixmap()
+            self.board[lastMove.endRow][5] = "--"
+        elif lastMove.special == 'cl':
+            sq3 = self.squares[lastMove.endRow][0]
+            sq3.piece = os.path.join("images","pieces",f"{lastMove.pieceMoved[0]}R.svg")
+            sq3.refresh_pixmap()
+            self.board[lastMove.endRow][0] = f'{lastMove.pieceMoved[0]}R'
+            sq3 = self.squares[lastMove.endRow][3]
+            sq3.piece = None
+            sq3.refresh_pixmap()
+            self.board[lastMove.endRow][3] = "--"
 
     def isValidMove(self, move):
         uci_move = chess.Move.from_uci(move.getChessNotation())
@@ -175,7 +197,6 @@ class GameLoaded:
         self.current_pos = 0
 
     def get_move(self, direction, board):
-        print(board)
         if direction == 'f' and self.current_pos < len(self.moves):
             uci = self.moves[self.current_pos].__str__()
             self.current_pos += 1
@@ -188,13 +209,11 @@ class GameLoaded:
             return move
 
     def uci2_pos(self, uci):
-        print(uci)
         pos1 = [8-int(uci[1]), self.filesToCols[uci[0]]]
         pos2 = [8-int(uci[3]), self.filesToCols[uci[2]]]
         return pos1, pos2
 
     def _move_from_uci(self, uci, board):
         pos1, pos2 = self.uci2_pos(uci)
-        print(f"Pos1={pos1} Pos2={pos2}")
         move = Move(pos1,pos2,board)
         return move
