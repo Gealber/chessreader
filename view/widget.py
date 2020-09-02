@@ -156,16 +156,19 @@ class MainWindow(QWidget):
         if self.game_state.game_loaded:
             game = self.game_state.game_loaded
             move = game.get_move('f', self.game_state.board)
-            self.game_state.makeMove(move)
             print(move, game.current_pos)
+            if move is not None:
+                self.game_state.makeMove(move)
 
 
     def onBackwardPressed(self, button):
         print("Backward pressed")
         if self.game_state.game_loaded:
-            game = self.game_state.game_loaded
-            move = game.get_move('b', self.game_state.board)
-            self.game_state.makeMove(move)
-            print(move, game.current_pos)
+            self.game_state.undoMove()
+#            game = self.game_state.game_loaded
+#            move = game.get_move('b', self.game_state.board)
+#            if move is not None:
+#                self.game_state.makeMove(move)
+#            print(move, game.current_pos)
 
 

@@ -47,6 +47,7 @@ class GameState:
     def undoMove(self):
         if self.moveLog:
             lastMove = self.moveLog.pop()
+            print(lastMove, self.moveLog)
             self.board[lastMove.endRow][lastMove.endCol] = lastMove.pieceCapture
             self.board[lastMove.startRow][lastMove.startCol] = lastMove.pieceMoved
             self.whiteToMove = not self.whiteToMove
@@ -128,6 +129,8 @@ class Move:
         if isinstance(other, Move):
             return self.moveID == other.moveID
         return False
+    def __repr__(self):
+        return f"<Move sq1='{self.pieceMoved}' sq2='{self.pieceCapture}'>"
 
     def getChessNotation(self):
         startRankFile = self.getRankFile(self.startRow, self.startCol)
@@ -151,6 +154,7 @@ class GameLoaded:
         self.current_pos = 0
 
     def get_move(self, direction, board):
+        print(board)
         if direction == 'f' and self.current_pos < len(self.moves):
             uci = self.moves[self.current_pos].__str__()
             self.current_pos += 1
@@ -163,11 +167,13 @@ class GameLoaded:
             return move
 
     def uci2_pos(self, uci):
-        pos1 = [self.filesToCols[uci[0]], int(uci[1])]
-        pos2 = [self.filesToCols[uci[2]], int(uci[3])]
+        print(uci)
+        pos1 = [8-int(uci[1]), self.filesToCols[uci[0]]]
+        pos2 = [8-int(uci[3]), self.filesToCols[uci[2]]]
         return pos1, pos2
 
     def _move_from_uci(self, uci, board):
         pos1, pos2 = self.uci2_pos(uci)
+        print(f"Pos1={pos1} Pos2={pos2}")
         move = Move(pos1,pos2,board)
         return move
