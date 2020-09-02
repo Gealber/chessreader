@@ -139,3 +139,35 @@ class Move:
         return self.colsToFiles[c] + self.rowsToRanks[r]
 
 
+#You should make sure that game is instance of ...
+class GameLoaded:
+    letters = 'abcdefgh'
+    filesToCols = {v:k for k, v in enumerate(letters)}
+    def __init__(self, game):
+        self.game = game
+        self.headers = game.headers
+        self.FEN = game.headers.get("FEN")
+        self.moves = list(game.mainline_moves())
+        self.current_pos = 0
+
+    def get_move(self, direction, board):
+        if direction == 'f' and self.current_pos < len(self.moves):
+            uci = self.moves[self.current_pos].__str__()
+            self.current_pos += 1
+            move = self._move_from_uci(uci, board)
+            return move
+        elif direction == 'b' and self.current_pos > 0:
+            self.current_pos -= 1
+            uci = self.moves[self.current_pos-1].__str__()
+            move = self._move_from_uci(uci, board)
+            return move
+
+    def uci2_pos(self, uci):
+        pos1 = [self.filesToCols[uci[0]], int(uci[1])]
+        pos2 = [self.filesToCols[uci[2]], int(uci[3])]
+        return pos1, pos2
+
+    def _move_from_uci(self, uci, board):
+        pos1, pos2 = self.uci2_pos(uci)
+        move = Move(pos1,pos2,board)
+        return move

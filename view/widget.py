@@ -1,5 +1,5 @@
 from model.square import Square
-from model.engine import GameState, Move
+from model.engine import GameState, Move, GameLoaded
 import os
 import re
 import chess.pgn
@@ -123,14 +123,14 @@ class MainWindow(QWidget):
         if data.hasText():
             event.accept()
 
-    def extractFEN(self, file):
+    def extractGame(self, file):
         with open(file) as pgn:
             try:
                 new_board = chess.pgn.read_game(pgn)
             except Exception as e:
                 print("Bad encoding pgn: ", e)
                 return
-        return new_board.headers.get("FEN")
+        return new_board
 
 
     def dropEvent(self, event):
@@ -142,7 +142,9 @@ class MainWindow(QWidget):
         path_file = data.text().strip().replace("file://", "")
         isfile = os.path.isfile(path_file)
         if re.compile(r'.pgn$').findall(path_file) and isfile:
-            fen = self.extractFEN(path_file)
+            game = self.extractGame(path_file)
+            fen = game.headers.get("FEN")
+            self.game_state.game_loaded = GameLoaded(game)
             if fen:
                 #Need to handle the FEN
                 self._render(fen)
@@ -151,7 +153,19 @@ class MainWindow(QWidget):
 
     def onForwardPressed(self, button):
         print("Forward pressed")
+        if self.game_state.game_loaded:
+            game = self.game_state.game_loaded
+            move = game.get_move('f', self.game_state.board)
+            self.game_state.makeMove(move)
+            print(move, game.current_pos)
+
 
     def onBackwardPressed(self, button):
         print("Backward pressed")
+        if self.game_state.game_loaded:
+            game = self.game_state.game_loaded
+            move = game.get_move('b', self.game_state.board)
+            self.game_state.makeMove(move)
+            print(move, game.current_pos)
+
 
