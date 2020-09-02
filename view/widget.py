@@ -38,7 +38,8 @@ class MainWindow(QWidget):
         self.vlayout.setSpacing(2)
 
         self.lowerbar = LowerBar()
-        #self.setLayout(self._layout)
+        self.lowerbar.forward.pressed.connect(self.onForwardPressed)
+        self.lowerbar.backward.pressed.connect(self.onBackwardPressed)
         self.setFixedSize(630, 660)
         self.game_state = GameState(self.squares)
         self.vlayout.addLayout(self._layout)
@@ -148,4 +149,9 @@ class MainWindow(QWidget):
             else:
                 print("Not a valid pgn")
 
+    def onForwardPressed(self, button):
+        print("Forward pressed")
+
+    def onBackwardPressed(self, button):
+        print("Backward pressed")
 

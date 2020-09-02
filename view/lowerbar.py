@@ -7,14 +7,11 @@ from PyQt5.QtWidgets import *
 from PyQt5.QtGui import *
 from PyQt5.QtCore import *
 
+
 class LowerBar(QWidget):
     def __init__(self, *args, **kwargs):
         super(LowerBar, self).__init__(*args, **kwargs)
-       # self.setAutoFillBackground(True)
 
-       # palette = self.palette()
-       # palette.setColor(QPalette.Window, QColor(color))
-       # self.setPalette(palette)
 
         self.setFixedSize(630, 30)
         self._layout = QHBoxLayout()
@@ -25,7 +22,7 @@ class LowerBar(QWidget):
         self.setLayout(self._layout)
 
 class ForwardButton(QLabel):
-    forwardPressed = pyqtSignal(QLabel)
+    pressed = pyqtSignal(QLabel)
     def __init__(self):
         super().__init__()
 
@@ -34,18 +31,17 @@ class ForwardButton(QLabel):
         self.setFixedSize(40, 20)
 
     def mousePressEvent(self, event):
-        self.forwardPressed.emit(self)
+        self.pressed.emit(self)
 
 class BackwardButton(QLabel):
-    backwardPressed = pyqtSignal(QLabel)
+    pressed = pyqtSignal(QLabel)
     def __init__(self):
         super().__init__()
         pixmap = QPixmap('images/arrow-180.png')
         self.setPixmap(pixmap)
         self.setFixedSize(40, 20)
-
     def mousePressEvent(self, event):
-        self.backwardPressed.emit(self)
+        self.pressed.emit(self)
 
 
 if __name__ == '__main__':
