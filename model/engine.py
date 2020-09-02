@@ -1,3 +1,11 @@
+"""
+Contains all the state of the game. There are three principal classes here:
+GameState: like the name say contains the actual state of the game.
+Move: Describe a move in the game.
+GameLoaded: This is only in case a pgn file is drop into the board, so in this case
+the state of the game will be refreshed and will be the current pgn dropped.
+"""
+
 import chess
 import os
 from PyQt5.QtWidgets import *
@@ -5,6 +13,17 @@ from PyQt5.QtCore import *
 from PyQt5.QtGui import *
 
 class GameState:
+    """
+    Describe the state of the game
+    squares: a list with all the square widgets
+    _board: the game in the python-chess,
+    necesary to validate moves and all the logic.
+    board: a representation of the square necesary to paint the board.
+    moveLog: a log of all the move that were made.
+    playerClicks: to keep a count on the clicks of the user,
+    is empty every two clicks.
+    game_loaded: a flag to know if a pgn was dropped.
+    """
     def __init__(self, squares):
         self.squares = squares
         self._board = chess.Board()
@@ -63,18 +82,26 @@ class GameState:
             self.whiteToMove = not self.whiteToMove
 
     def passant_update(self, lastMove):
-            if lastMove.special == 'pb':
-                sq3 = self.squares[lastMove.endRow-1][lastMove.endCol]
-                sq3.piece = os.path.join("images","pieces","wP.svg")
-                self.board[lastMove.endRow-1][lastMove.endCol] = 'wP'
-                sq3.refresh_pixmap()
-            elif lastMove.special == 'pw':
-                sq3 = self.squares[lastMove.endRow+1][lastMove.endCol]
-                sq3.piece = os.path.join("images", "pieces", "bP.svg")
-                self.board[lastMove.endRow+1][lastMove.endCol] = 'bP'
-                sq3.refresh_pixmap()
+        """
+        Update the correct pixmaps in case a
+        pawn passant was made. Also update board.
+        """
+        if lastMove.special == 'pb':
+            sq3 = self.squares[lastMove.endRow-1][lastMove.endCol]
+            sq3.piece = os.path.join("images","pieces","wP.svg")
+            self.board[lastMove.endRow-1][lastMove.endCol] = 'wP'
+            sq3.refresh_pixmap()
+        elif lastMove.special == 'pw':
+            sq3 = self.squares[lastMove.endRow+1][lastMove.endCol]
+            sq3.piece = os.path.join("images", "pieces", "bP.svg")
+            self.board[lastMove.endRow+1][lastMove.endCol] = 'bP'
+            sq3.refresh_pixmap()
 
     def castling_update(self,lastMove):
+        """
+        Update the correct pixmaps in case a castling
+        was made.
+        """
         if lastMove.special == 'cr':
             sq3 = self.squares[lastMove.endRow][7]
             sq3.piece = os.path.join("images","pieces",f"{lastMove.pieceMoved[0]}R.svg")
@@ -95,6 +122,10 @@ class GameState:
             self.board[lastMove.endRow][3] = "--"
 
     def isValidMove(self, move):
+        """
+        Validate the move using python-chess. In case
+        of been a valid move is pushed into _board.
+        """
         uci_move = chess.Move.from_uci(move.getChessNotation())
         isvalid = uci_move in self._board.legal_moves
         if isvalid:
@@ -152,6 +183,9 @@ class GameState:
 
 
 class Move:
+    """
+    Move represent a move in the game.
+    """
     ranksToRows = {f"{8-i}": i for i in range(7, -1, -1)}
     rowsToRanks = {v: k for k, v in ranksToRows.items()}
     letters = 'abcdefgh'
@@ -185,8 +219,11 @@ class Move:
         return self.colsToFiles[c] + self.rowsToRanks[r]
 
 
-#You should make sure that game is instance of ...
 class GameLoaded:
+    """
+    Represent the info when a widget is dropped into the
+    widget.
+    """
     letters = 'abcdefgh'
     filesToCols = {v:k for k, v in enumerate(letters)}
     def __init__(self, game):
