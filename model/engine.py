@@ -215,9 +215,28 @@ class Move:
         return startRankFile + endRankFile
 
     def getSan(self):
+        capture = False
+        piece = ""
         endRankFile = self.getRankFile(self.endRow, self.endCol)
-        piece = "" if self.pieceMoved[1] == "P" else self.pieceMoved[1]
-        return piece+endRankFile
+        startRankFile = self.getRankFile(self.startRow, self.startCol)
+        if self.pieceMoved[1] == "P" and self.pieceCapture != "--":
+            piece = startRankFile
+        elif self.pieceMoved[1] == "P" and self.pieceCapture == "--":
+            piece = ""
+        elif self.pieceMoved[1] == "K":
+            if self.special == "cr":
+                return "0-0"
+            elif self.special == "cl":
+                return "0-0-0"
+            else:
+                piece = self.pieceMoved[1]
+        else:
+            piece = self.pieceMoved[1]
+
+        if self.pieceCapture != "--":
+            capture = True
+        x = "x" if capture else ""
+        return f"{piece}{x}{endRankFile}"
 
     def getRankFile(self, r, c):
         return self.colsToFiles[c] + self.rowsToRanks[r]
