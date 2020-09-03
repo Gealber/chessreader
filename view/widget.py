@@ -7,6 +7,7 @@ from PyQt5.QtWidgets import *
 from PyQt5.QtCore import *
 from PyQt5.QtGui import *
 from view.lowerbar import LowerBar
+from view.rightside import Table
 
 
 IMAGE_DIR = os.path.join('images', 'pieces')
@@ -30,9 +31,11 @@ class MainWindow(QWidget):
 
         self.squares = []
         self.setWindowTitle("Chess Board")
+        self.setWindowIcon(QIcon('images/bug.png'))
 
         self.vlayout = QVBoxLayout()
         self._layout = QGridLayout()
+        self.hlayout = QHBoxLayout()
         self.setSquares()
         self._layout.setSpacing(0)
         self.vlayout.setSpacing(2)
@@ -40,9 +43,14 @@ class MainWindow(QWidget):
         self.lowerbar = LowerBar()
         self.lowerbar.forward.pressed.connect(self.onForwardPressed)
         self.lowerbar.backward.pressed.connect(self.onBackwardPressed)
-        self.setFixedSize(630, 660)
+        #RightSide
+        self.table = Table()
+
+        self.setFixedSize(850, 660)
         self.game_state = GameState(self.squares)
-        self.vlayout.addLayout(self._layout)
+        self.hlayout.addLayout(self._layout)
+        self.hlayout.addWidget(self.table)
+        self.vlayout.addLayout(self.hlayout)
         self.vlayout.addWidget(self.lowerbar)
         self.setLayout(self.vlayout)
 
