@@ -44,7 +44,7 @@ class MainWindow(QWidget):
         self.lowerbar.forward.pressed.connect(self.onForwardPressed)
         self.lowerbar.backward.pressed.connect(self.onBackwardPressed)
         #RightSide
-        self.table = Table()
+        self.table = Table(dark=dark)
 
         self.setFixedSize(850, 660)
         self.game_state = GameState(self.squares)
@@ -122,6 +122,7 @@ class MainWindow(QWidget):
             move = Move(sq1.pos, sq2.pos, self.game_state.board)
             if self.game_state.isValidMove(move):
                 self.game_state.makeMove(move)
+                self.table.add_item(move.getSan())
             else:
                 print("Not a valid move moron!")
             self.game_state.playerClicks = []
@@ -151,11 +152,15 @@ class MainWindow(QWidget):
         isfile = os.path.isfile(path_file)
         if re.compile(r'.pgn$').findall(path_file) and isfile:
             game = self.extractGame(path_file)
-            fen = game.headers.get("FEN")
-            self.game_state.game_loaded = GameLoaded(game)
-            if fen:
-                #Need to handle the FEN
-                self._render(fen)
+            if game is not None:
+                fen = game.headers.get("FEN")
+                self.game_state.game_loaded = GameLoaded(game)
+                self.table.clean_table()
+                if fen:
+                    #Need to handle the FEN
+                    self._render(fen)
+                else:
+                    print("FEN not present")
             else:
                 print("Not a valid pgn")
 
@@ -165,8 +170,12 @@ class MainWindow(QWidget):
             move = game.get_move('f', self.game_state.board)
             if move is not None and self.game_state.isValidMove(move):
                 self.game_state.makeMove(move)
+                play = move.getSan()
+                self.table.add_item(play)
 
 
     def onBackwardPressed(self, button):
+        if self.game_state.game_loaded is not None:
+            self.game_state.game_loaded.get_move('b', self.game_state.board)
         self.game_state.undoMove()
-
+        self.table.remove_item()

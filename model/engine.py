@@ -52,7 +52,7 @@ class GameState:
         if self._board.is_check():
             print("You are in check moron")
             if self._board.is_checkmate():
-                print("Ouuu your done moron")
+                print("Ouuu you're done moron")
         self.board[move.startRow][move.startCol] = "--"
         self.board[move.endRow][move.endCol] = move.pieceMoved
         self.replacePieces(move.startRow, move.startCol, move.endRow, move.endCol)
@@ -214,6 +214,10 @@ class Move:
         endRankFile = self.getRankFile(self.endRow, self.endCol)
         return startRankFile + endRankFile
 
+    def getSan(self):
+        endRankFile = self.getRankFile(self.endRow, self.endCol)
+        piece = "" if self.pieceMoved[1] == "P" else self.pieceMoved[1]
+        return piece+endRankFile
 
     def getRankFile(self, r, c):
         return self.colsToFiles[c] + self.rowsToRanks[r]
@@ -239,6 +243,7 @@ class GameLoaded:
             self.current_pos += 1
             move = self._move_from_uci(uci, board)
             return move
+
         elif direction == 'b' and self.current_pos > 0:
             self.current_pos -= 1
             uci = self.moves[self.current_pos-1].__str__()
