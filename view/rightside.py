@@ -11,7 +11,7 @@ class Table(QTableWidget):
                 "color: white"
             )
 
-        self.setFixedSize(200, 600)
+        self.setFixedSize(220, 600)
         self.setColumnCount(2)
         white = QTableWidgetItem()
         white.setText("White")

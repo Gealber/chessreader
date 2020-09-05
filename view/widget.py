@@ -45,7 +45,6 @@ class MainWindow(QWidget):
         self.lowerbar.backward.pressed.connect(self.onBackwardPressed)
         #RightSide
         self.table = Table(dark=dark)
-
         self.setFixedSize(850, 660)
         self.game_state = GameState(self.squares)
         self.hlayout.addLayout(self._layout)
